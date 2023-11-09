@@ -1,5 +1,8 @@
+extern crate colored;
+extern crate rand;
+
 mod maze_operations {
-    extern crate rand;
+    use colored::*;
     use rand::{seq::SliceRandom, thread_rng};
     use std::fmt;
 
@@ -39,21 +42,19 @@ mod maze_operations {
     impl Maze {
         pub fn new(height: usize, width: usize, algorithm: CreationAlgorithm) -> Self {
             use CreationAlgorithm::*;
-            // Mazes only work well with odd-number dimensions
-            // Example of name shadowing--you can redeclare variables in the
-            // same scope
-            // Also an example of how type names are optional if the compiler
-            // can infer them
             if height < 2 || width < 2 {
                 panic!("Can't create a maze this small")
             }
+            // Mazes only work well with odd-number dimensions
+            // Example of name shadowing--you can redeclare variables in the same scope
+            // Also an example of how type names are optional if the compiler can infer them
             let height = if height % 2 == 0 { height + 1 } else { height };
             let width = if width % 2 == 0 { width + 1 } else { width };
 
             let cells: Vec<Vec<Cell>> = vec![
                 vec![
                     Cell {
-                        // match statements must enumerate all variants in arms
+                        // match statements must enumerate all variants in their arms
                         wall: match algorithm {
                             RandomWalk => true,
                             Debug => true,
@@ -73,9 +74,22 @@ mod maze_operations {
             }
         }
 
+        fn shuffle_directions() -> [Direction; 4] {
+            use Direction::*;
+            let mut directions = [North, South, East, West];
+            let mut rng = thread_rng();
+            directions.shuffle(&mut rng);
+            directions
+        }
+
         fn gen_from_walk(mut cells: Vec<Vec<Cell>>, dimensions: (usize, usize)) -> Self {
             let entrypoint: (usize, usize) = (1, 0);
-            cells.get_mut(0).unwrap().get_mut(1).unwrap().wall = false;
+            cells
+                .get_mut(entrypoint.0)
+                .unwrap()
+                .get_mut(entrypoint.1)
+                .unwrap()
+                .wall = false;
 
             let goalpoint: (usize, usize) = (dimensions.0 - 2, dimensions.1 - 1);
             cells
@@ -204,12 +218,8 @@ mod maze_operations {
             }
         }
 
-        fn shuffle_directions() -> [Direction; 4] {
-            use Direction::*;
-            let mut directions = [North, South, East, West];
-            let mut rng = thread_rng();
-            directions.shuffle(&mut rng);
-            directions
+        fn gen_from_divide(mut cells: Vec<Vec<Cell>>) -> Self {
+            unimplemented!();
         }
 
         fn debug(cells: Vec<Vec<Cell>>) -> Self {
@@ -228,23 +238,23 @@ mod maze_operations {
                        // the name of the local variable/struct attribute once
             }
         }
-
-        fn gen_from_divide(mut cells: Vec<Vec<Cell>>) -> Self {
-            unimplemented!();
-        }
     }
 
     impl fmt::Display for Maze {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            for row in &self.cells {
-                for cell in row {
+            for (y, row) in self.cells.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
                     write!(f, "{}", {
-                        if cell.wall {
-                            "#"
+                        if (y, x) == self.entrypoint {
+                            "\u{00A0}\u{00A0}".on_red()
+                        } else if (y, x) == self.goalpoint {
+                            "\u{00A0}\u{00A0}".on_green()
+                        } else if cell.wall {
+                            "\u{00A0}\u{00A0}".on_white()
                         } else if cell.visited {
-                            "."
+                            "\u{00A0}\u{00A0}".on_blue()
                         } else {
-                            " "
+                            "\u{00A0}\u{00A0}".on_black()
                         }
                     })?;
                 }
@@ -258,4 +268,6 @@ mod maze_operations {
 use maze_operations::*;
 fn main() {
     let maze: Maze = Maze::new(7, 7, CreationAlgorithm::RandomWalk);
+    println!("{}", maze);
+    //println!("{:#?}", maze)
 }
