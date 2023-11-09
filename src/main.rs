@@ -1,18 +1,18 @@
 mod maze_operations {
     extern crate rand;
-    use rand::seq::SliceRandom;
-    use rand::thread_rng;
+    use rand::{seq::SliceRandom, thread_rng};
     use std::fmt;
 
+    #[derive(Debug)]
     pub struct Maze {
         // tuples
         dimensions: (usize, usize), // (height, width)
-        entrypoint: (usize, usize), // (x, y) of start
-        goalpoint: (usize, usize),  // (x, y) of end
+        entrypoint: (usize, usize), // (y, x) of start
+        goalpoint: (usize, usize),  // (y, x) of end
         cells: Vec<Vec<Cell>>,
     }
 
-    #[derive(Clone)] // required because vec![] uses .clone() on cell structs
+    #[derive(Clone, Debug)] // required because vec![] uses .clone() on cell structs
     struct Cell {
         wall: bool,
         visited: bool,
@@ -44,6 +44,9 @@ mod maze_operations {
             // same scope
             // Also an example of how type names are optional if the compiler
             // can infer them
+            if height < 2 || width < 2 {
+                panic!("Can't create a maze this small")
+            }
             let height = if height % 2 == 0 { height + 1 } else { height };
             let width = if width % 2 == 0 { width + 1 } else { width };
 
@@ -71,10 +74,10 @@ mod maze_operations {
         }
 
         fn gen_from_walk(mut cells: Vec<Vec<Cell>>, dimensions: (usize, usize)) -> Self {
-            let entrypoint: (usize, usize) = (0, 1);
+            let entrypoint: (usize, usize) = (1, 0);
             cells.get_mut(0).unwrap().get_mut(1).unwrap().wall = false;
 
-            let goalpoint: (usize, usize) = (dimensions.0 - 1, dimensions.1 - 2);
+            let goalpoint: (usize, usize) = (dimensions.0 - 2, dimensions.1 - 1);
             cells
                 .get_mut(goalpoint.0)
                 .unwrap()
@@ -110,23 +113,19 @@ mod maze_operations {
             for direction in directions {
                 match direction {
                     North => {
-                        // if going North isn't on the outer wall or out-of-bounds
-                        if pos.1 as isize - 2 > 0 {
-                            // access cell that's 2 North of current cell (these should always work)
-                            if let Some(row) = cells.get_mut(pos.0) {
-                                if let Some(cell) = row.get_mut(pos.1 - 2) {
-                                    // if cell 2 North of current pos not visited, remove wall
-                                    // between and walk from the cell 2 North of current pos
+                        if pos.0 as isize - 2 > 0 {
+                            if let Some(row) = cells.get_mut(pos.0 - 2) {
+                                if let Some(cell) = row.get_mut(pos.1) {
                                     if !cell.visited {
                                         cells
-                                            .get_mut(pos.0)
+                                            .get_mut(pos.0 - 1)
                                             .unwrap()
-                                            .get_mut(pos.1 - 1)
+                                            .get_mut(pos.1)
                                             .unwrap()
                                             .wall = false;
                                         Self::walk(
                                             cells,
-                                            (pos.0, pos.1 - 2),
+                                            (pos.0 - 2, pos.1),
                                             (dimensions.0, dimensions.1),
                                         );
                                     }
@@ -134,7 +133,7 @@ mod maze_operations {
                             }
                         }
                     }
-                    East => {
+                    South => {
                         if pos.0 + 2 < dimensions.0 - 1 {
                             if let Some(row) = cells.get_mut(pos.0 + 2) {
                                 if let Some(cell) = row.get_mut(pos.1) {
@@ -155,7 +154,7 @@ mod maze_operations {
                             }
                         }
                     }
-                    South => {
+                    East => {
                         if pos.1 + 2 < dimensions.1 - 1 {
                             if let Some(row) = cells.get_mut(pos.0) {
                                 if let Some(cell) = row.get_mut(pos.1 + 2) {
@@ -177,19 +176,23 @@ mod maze_operations {
                         }
                     }
                     West => {
-                        if pos.0 as isize - 2 > 0 {
-                            if let Some(row) = cells.get_mut(pos.0 - 2) {
-                                if let Some(cell) = row.get_mut(pos.1) {
+                        // if going North isn't on the outer wall or out-of-bounds
+                        if pos.1 as isize - 2 > 0 {
+                            // access cell that's 2 North of current cell (these should always work)
+                            if let Some(row) = cells.get_mut(pos.0) {
+                                if let Some(cell) = row.get_mut(pos.1 - 2) {
+                                    // if cell 2 North of current pos not visited, remove wall
+                                    // between and walk from the cell 2 North of current pos
                                     if !cell.visited {
                                         cells
-                                            .get_mut(pos.0 - 1)
+                                            .get_mut(pos.0)
                                             .unwrap()
-                                            .get_mut(pos.1)
+                                            .get_mut(pos.1 - 1)
                                             .unwrap()
                                             .wall = false;
                                         Self::walk(
                                             cells,
-                                            (pos.0 - 2, pos.1),
+                                            (pos.0, pos.1 - 2),
                                             (dimensions.0, dimensions.1),
                                         );
                                     }
@@ -254,6 +257,5 @@ mod maze_operations {
 
 use maze_operations::*;
 fn main() {
-    let maze: Maze = Maze::new(15, 30, CreationAlgorithm::RandomWalk);
-    println!("{}", maze);
+    let maze: Maze = Maze::new(7, 7, CreationAlgorithm::RandomWalk);
 }
