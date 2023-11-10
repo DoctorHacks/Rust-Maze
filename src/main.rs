@@ -30,6 +30,7 @@ mod maze_operations {
     pub enum CreationAlgorithm {
         RandomWalk,
         RecursiveDivision,
+        Prim,
         Debug,
     }
 
@@ -38,17 +39,18 @@ mod maze_operations {
         Tremaux,
     }
 
+    #[derive(Clone, Copy)]
     enum Direction {
         North,
-        East,
         South,
+        East,
         West,
     }
 
     impl Maze {
         pub fn new(dimensions: (usize, usize), algorithm: CreationAlgorithm) -> Self {
             use CreationAlgorithm::*;
-            // Mazes smaller than 3x3 don't make sense (dimensions.0/1 == 2 case handled below)
+            // Mazes smaller than 3x3 don't make sense (dimension == 2 case handled below)
             if dimensions.0 < 2 || dimensions.1 < 2 {
                 panic!("Can't create a maze this small")
             }
@@ -85,6 +87,7 @@ mod maze_operations {
             match algorithm {
                 RandomWalk => Self::gen_from_walk(cells, (height, width)),
                 RecursiveDivision => Self::gen_from_divide(cells),
+                Prim => Self::gen_from_prim(cells),
                 Debug => Self::debug(cells),
             }
         }
@@ -224,6 +227,7 @@ mod maze_operations {
                 Self::divide(cells, top_left, (wall_index, bottom_right.1));
                 Self::divide(cells, (wall_index, top_left.1), bottom_right);
             } else {
+                // if the area to divide is wider than it is tall (same procedure as above)
                 let mut wall_index = rng.gen_range((top_left.1 + 1)..bottom_right.1);
                 while wall_index % 2 != 0 {
                     wall_index = rng.gen_range((top_left.1 + 1)..bottom_right.1);
@@ -244,6 +248,110 @@ mod maze_operations {
             }
         }
 
+        fn gen_from_prim(mut cells: Vec<Vec<Cell>>) -> Self {
+            let dimensions: (usize, usize) = (cells.len(), cells[0].len());
+            let entrypoint: (usize, usize) = (1, 0);
+            let goalpoint: (usize, usize) = (cells.len() - 2, cells[0].len() - 1);
+
+            cells[1][1].wall = false;
+            let mut rng = rand::thread_rng();
+            let mut frontiers: Vec<(usize, usize)> = vec![];
+
+            // Compute frontier cells of (1, 1) and add them to the vector
+            Self::append_frontiers(&cells, &mut frontiers, (1, 1));
+
+            use Direction::*;
+            // While the list of frontier cells is not empty:
+            while frontiers.len() > 0 {
+                // Pick a random cell from the list. Mark it as not a wall.
+                let rand_frontier_index: usize = rng.gen_range(0..frontiers.len());
+                let current: (usize, usize) = frontiers[rand_frontier_index];
+                cells[current.0][current.1].wall = false;
+
+                // Let its neighbors be all the cells 2 apart from it that aren't walls.
+                let mut neighbors: Vec<Direction> = vec![];
+                if current.0 as isize - 2 > 0 && !cells[current.0 - 2][current.1].wall {
+                    neighbors.push(North);
+                }
+                if current.0 + 2 < dimensions.0 - 1 && !cells[current.0 + 2][current.1].wall {
+                    neighbors.push(South);
+                }
+                if current.1 + 2 < dimensions.1 - 1 && !cells[current.0][current.1 + 2].wall {
+                    neighbors.push(East);
+                }
+                if current.1 as isize - 2 > 0 && !cells[current.0][current.1 - 2].wall {
+                    neighbors.push(West);
+                }
+
+                // Pick a random neighbor and connect the randomly chosen frontier cell with its
+                // neighbor by setting the cell in-between them to not a wall.
+                let neighbor: Direction = neighbors[rng.gen_range(0..neighbors.len())];
+                match neighbor {
+                    North => {
+                        cells[current.0 - 1][current.1].wall = false;
+                    }
+                    South => {
+                        cells[current.0 + 1][current.1].wall = false;
+                    }
+                    East => {
+                        cells[current.0][current.1 + 1].wall = false;
+                    }
+                    West => {
+                        cells[current.0][current.1 - 1].wall = false;
+                    }
+                }
+
+                // Compute the frontier cells of the randomly chosen frontier cell and add them to
+                // the list, if they aren't already in the list.
+                Self::append_frontiers(&cells, &mut frontiers, current);
+
+                // remove the randomly chosen frontier cell from the list.
+                frontiers.remove(rand_frontier_index);
+            }
+
+            Maze {
+                dimensions,
+                entrypoint,
+                goalpoint,
+                cells,
+            }
+        }
+
+        fn append_frontiers(
+            cells: &Vec<Vec<Cell>>,
+            frontiers: &mut Vec<(usize, usize)>,
+            pos: (usize, usize),
+        ) {
+            // North frontier
+            if pos.0 as isize - 2 > 0
+                && cells[pos.0 - 2][pos.1].wall
+                && !frontiers.contains(&(pos.0 - 2, pos.1))
+            {
+                frontiers.push((pos.0 - 2, pos.1));
+            }
+            // South frontier
+            if pos.0 + 2 < cells.len() - 1
+                && cells[pos.0 + 2][pos.1].wall
+                && !frontiers.contains(&(pos.0 + 2, pos.1))
+            {
+                frontiers.push((pos.0 + 2, pos.1));
+            }
+            // East frontier
+            if pos.1 + 2 < cells[0].len() - 1
+                && cells[pos.0][pos.1 + 2].wall
+                && !frontiers.contains(&(pos.0, pos.1 + 2))
+            {
+                frontiers.push((pos.0, pos.1 + 2));
+            }
+            // West frontier
+            if pos.1 as isize - 2 > 0
+                && cells[pos.0][pos.1 - 2].wall
+                && !frontiers.contains(&(pos.0, pos.1 - 2))
+            {
+                frontiers.push((pos.0, pos.1 - 2));
+            }
+        }
+
         fn shuffle_directions() -> [Direction; 4] {
             use Direction::*;
             let mut directions = [North, South, East, West];
@@ -255,8 +363,8 @@ mod maze_operations {
         fn debug(cells: Vec<Vec<Cell>>) -> Self {
             Maze {
                 dimensions: (cells.len(), cells[0].len()),
-                goalpoint: (cells.len(), cells[0].len() - 1),
-                entrypoint: (0, 0),
+                entrypoint: (1, 0),
+                goalpoint: (cells.len() - 2, cells[0].len() - 1),
                 cells, // if you specify cells before dimensions or goal, it will not work, because
                        // because the Maze struct takes ownership of cells, which means cells goes
                        // out of scope in debug()
@@ -298,6 +406,6 @@ mod maze_operations {
 
 use maze_operations::*;
 fn main() {
-    let maze: Maze = Maze::new((25, 35), CreationAlgorithm::RecursiveDivision);
+    let maze: Maze = Maze::new((25, 25), CreationAlgorithm::Prim);
     println!("{}", maze);
 }
