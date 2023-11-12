@@ -61,14 +61,21 @@ fn main() {
                         }
                         _ => println!("Please input an acceptable integer.")
                     }
-                }
+                } 
                 println!("{} {}", rows, cols);
                 println!("{}", maze);
                 println!("Press enter to show the solved maze using recursive backtracking");
+                let mut input = String::new();
+                io::stdin().read_line(&mut input);
                 let timer = Instant::now();
                 maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
                 println!("It took {} Seconds", time.elapsed());
                 println!("Press enter to show the solved maze using dead end filling");
+                let mut input = String::new();
+                io::stdin().read_line(&mut input);
+                let timer = Instant::now();
+                maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
+                println!("It took {} Seconds", time.elapsed());
                /** loop{
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).expect("No line given.");
@@ -89,11 +96,10 @@ fn main() {
                         _ => {println!("Please input an acceptable integer.");}
                     }
                 }*/
-                println!("{}", maze);
+                //println!("{}", maze);
         } else if x == 2 {
             break;
         } else {
-            // h
             println!("Please input an acceptable integer.");
         }
     }
