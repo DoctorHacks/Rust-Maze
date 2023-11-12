@@ -1,6 +1,7 @@
 mod maze;
 use maze::maze_operations;
 use std::io;
+use std::time::Instant;
 
 use crate::maze_operations::*;
 fn main() {
@@ -72,11 +73,15 @@ fn main() {
                     let x: usize = input.trim().parse().expect("Please input an integer.");
                     match x{
                         1 => {
+                            let timer = Instant::now();
                             maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
+                            println!("It took " + timer.elapsed + " Seconds");
                             break;
                         }
                         2 => {
+                            let timer = Instant::now();
                             maze.solve_from(SolvingAlgorithm::DeadEndFilling);
+                            println!("It took " + timer.elapsed + " Seconds");
                             break;
                         }
                         _ => {println!("Please input an acceptable integer.");}
