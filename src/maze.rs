@@ -8,7 +8,7 @@
 extern crate colored;
 extern crate rand;
 
-mod maze_operations {
+pub mod maze_operations {
     use colored::*;
     use rand::{seq::SliceRandom, thread_rng, Rng};
     use std::fmt;
