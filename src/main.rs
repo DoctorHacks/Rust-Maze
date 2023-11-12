@@ -67,40 +67,25 @@ fn main() {
             }
             println!("{} {}", rows, cols);
             println!("{}", maze);
+
+            //Recursive Backtracking Solver
             println!("Press enter to show the solved maze using recursive backtracking");
             let mut input = String::new();
             io::stdin().read_line(&mut input);
             let timer = Instant::now();
             maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-            println!("{}", maze);
             println!("It took {:?} Seconds", timer.elapsed());
+            println!("{}", maze);
+
+            //Dead End Filling Solver
             println!("Press enter to show the solved maze using dead end filling");
             let mut input = String::new();
             io::stdin().read_line(&mut input);
             let timer = Instant::now();
             maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-            println!("{}", maze);
             println!("It took {:?} Seconds", timer.elapsed());
-            /* loop{
-                let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("No line given.");
-                let x: usize = input.trim().parse().expect("Please input an integer.");
-                match x{
-                    1 => {
-                        let timer = Instant::now();
-                        maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-                        println!("It took {} Seconds", time.elapsed());
-                        break;
-                    }
-                    2 => {
-                        let timer = Instant::now();
-                        maze.solve_from(SolvingAlgorithm::DeadEndFilling);
-                        println!("It took {} Seconds", time.elapsed());
-                        break;
-                    }
-                    _ => {println!("Please input an acceptable integer.");}
-                }
-            }*/
+            println!("{}", maze);
+            
         } else if x == 2 {
             break;
         } else {
