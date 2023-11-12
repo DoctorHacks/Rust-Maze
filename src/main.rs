@@ -75,13 +75,13 @@ fn main() {
                         1 => {
                             let timer = Instant::now();
                             maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-                            println!("It took " + timer.elapsed + " Seconds");
+                            println!("It took {} Seconds", time.elapsed());
                             break;
                         }
                         2 => {
                             let timer = Instant::now();
                             maze.solve_from(SolvingAlgorithm::DeadEndFilling);
-                            println!("It took " + timer.elapsed + " Seconds");
+                            println!("It took {} Seconds", time.elapsed());
                             break;
                         }
                         _ => {println!("Please input an acceptable integer.");}
