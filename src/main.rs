@@ -554,15 +554,15 @@ mod maze_operations {
                 for (x, cell) in row.iter().enumerate() {
                     write!(f, "{}", {
                         if (y, x) == self.entrypoint {
-                            "\u{2592}\u{2592}".red()
+                            "\u{2592}\u{2592}".red().on_red()
                         } else if (y, x) == self.goalpoint {
-                            "\u{2592}\u{2592}".green()
+                            "\u{2592}\u{2592}".green().on_green()
                         } else if cell.wall {
-                            "\u{2588}\u{2588}".white()
+                            "\u{2588}\u{2588}".white().on_white()
                         } else if cell.visited {
-                            "\u{2593}\u{2593}".blue()
+                            "\u{2593}\u{2593}".blue().on_blue()
                         } else {
-                            "\u{00a0}\u{00a0}".black()
+                            "\u{00a0}\u{00a0}".clear()
                         }
                     })?;
                 }
