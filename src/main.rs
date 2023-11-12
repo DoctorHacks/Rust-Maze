@@ -130,6 +130,7 @@ mod maze_operations {
         /*
          * Generates a Maze using a random non-self-intersecting walk, beginning at a
          * randomly-selected cell.
+         * Only good for small Mazes--causes stack overflows for Mazes with more than ~32,000 Cells
          */
         fn gen_from_walk(mut cells: Vec<Vec<Cell>>) -> Self {
             let dimensions: (usize, usize) = (cells.len(), cells[0].len());
@@ -552,23 +553,20 @@ mod maze_operations {
             for (y, row) in self.cells.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     write!(f, "{}", {
-                        // no idea why, but Unicode 00A0 (NO-BREAK SPACE) was the only Unicode
-                        // character we could find that would print the highlight color and still
-                        // behave predictably when resizing the terminal window
                         if (y, x) == self.entrypoint {
-                            "\u{00A0}\u{00A0}".on_red()
+                            "\u{2592}\u{2592}".red()
                         } else if (y, x) == self.goalpoint {
-                            "\u{00A0}\u{00A0}".on_green()
+                            "\u{2592}\u{2592}".green()
                         } else if cell.wall {
-                            "\u{00A0}\u{00A0}".on_white()
+                            "\u{2588}\u{2588}".white()
                         } else if cell.visited {
-                            "\u{00A0}\u{00A0}".on_blue()
+                            "\u{2593}\u{2593}".blue()
                         } else {
-                            "\u{00A0}\u{00A0}".on_black()
+                            "\u{00a0}\u{00a0}".black()
                         }
                     })?;
                 }
-                write!(f, "{}", "\u{00A0}\n".clear())?;
+                write!(f, "{}", "\u{00a0}\n".clear())?;
             }
             Ok(())
         }
@@ -577,8 +575,8 @@ mod maze_operations {
 
 use maze_operations::*;
 fn main() {
-    let mut maze: Maze = Maze::new_from((55, 55), CreationAlgorithm::Prim);
+    let mut maze: Maze = Maze::new_from((31, 51), CreationAlgorithm::Prim);
     println!("{}", maze);
-    maze.solve_from(SolvingAlgorithm::DeadEndFilling);
+    maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
     println!("{}", maze);
 }
