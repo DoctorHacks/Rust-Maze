@@ -29,6 +29,14 @@ fn main() {
                     .parse()
                     .expect("Not a Valid Integer");
 
+                ////////
+                loop{
+                    "Type 1 to use Prim algorithm, Type 2 to use Random Walk algorithm, Type 3 to use Recursive Division algorithm"
+                    let mut input = String::new();
+                    io::stdin().read_line(&mut input).expect("No Line Given");
+                    let x: usize = input.trim().parse().expect("Please Input an Integer");
+                }
+                ////////
                 println!("{} {}", rows, cols);
                 let maze: Maze = Maze::new_from((rows, cols), CreationAlgorithm::Prim);
                 println!("{}", maze);
