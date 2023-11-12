@@ -78,7 +78,7 @@ fn main() {
                             maze.solve_from(self,SolvingAlgorithm::DeadEndFilling);
                             break;
                         }
-                        _ => println!("Please input an acceptable integer.")
+                        _ => println!("Please input an acceptable integer.");
                     }
                 }
                 println!("{}", maze);
