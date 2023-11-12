@@ -4,6 +4,8 @@ use std::io;
 
 use crate::maze_operations::*;
 fn main() {
+    let mut rows, cols;
+    let mut maze;
     let mut input = String::new();
     loop {
         println!("Type 1 to create and solve a maze.\nType 2 to quit.");
@@ -16,12 +18,12 @@ fn main() {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).expect("No line given.");
                 let mut nums = input.trim().split_whitespace();
-                let rows: usize = nums
+                rows: usize = nums
                     .next()
                     .expect("No Next.")
                     .parse()
                     .expect("Not a Valid Integer.");
-                let cols: usize = nums
+                cols: usize = nums
                     .next()
                     .expect("No Next")
                     .parse()
@@ -31,29 +33,54 @@ fn main() {
                     break;
                 } else println("Rows and cols must be 3 or greater.");
             }
+            //Loop for user to input how they want their maze to be generated
+            //1:Prim Algorithm 2:Random Walk Algorithm 3:Recursive Division Algorithm
+            println!("Choose which algorithm to use to generate maze\n
+                        Type 1 to use prim algorithm.\n
+                        Type 2 to use random walk algorithm.\n
+                        Type 3 to use recursive division algorithm.");
             loop {
-                    println!("Type 1 to use prim algorithm.\n Type 2 to use random walk algorithm.\n Type 3 to use recursive division algorithm.");
+                    
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).expect("No line given.");
                     let x: usize = input.trim().parse().expect("Please input an integer.");
                     match x{
                         1 => {
-                            let maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::Prim);
+                            maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::Prim);
                             break;
                         }
                         2 => {
-                            let maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::RandomWalk);
+                            maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::RandomWalk);
                             break;
                         }
                         3 => {
-                            let maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::RecursiveDivision);
+                            maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::RecursiveDivision);
                             break;
                         }
                         _ => println!("Please input an acceptable integer.")
                     }
                 }
-                ////////
                 println!("{} {}", rows, cols);
+                println!("{}", maze);
+                println!("Choose which algorithm to use to solve the maze\n
+                        Type 1 to use recursive backtracking algorithm.\n
+                        Type 2 to use dead end filling algorithm.\n");
+                loop{
+                    let mut input = String::new();
+                    io::stdin().read_line(&mut input).expect("No line given.");
+                    let x: usize = input.trim().parse().expect("Please input an integer.");
+                    match x{
+                        1 => {
+                            maze.solve_from(self,SolvingAlgorithm::RecursiveBacktracking);
+                            break;
+                        }
+                        2 => {
+                            maze.solve_from(self,SolvingAlgorithm::DeadEndFilling);
+                            break;
+                        }
+                        _ => println!("Please input an acceptable integer.")
+                    }
+                }
                 println!("{}", maze);
         } else if x == 2 {
             break;
