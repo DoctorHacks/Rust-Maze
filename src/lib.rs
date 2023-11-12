@@ -578,11 +578,3 @@ mod maze_operations {
         }
     }
 }
-
-use maze_operations::*;
-fn main() {
-    let mut maze: Maze = Maze::new_from((31, 51), CreationAlgorithm::Prim);
-    println!("{}", maze);
-    maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-    println!("{}", maze);
-}
