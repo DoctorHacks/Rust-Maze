@@ -1,3 +1,13 @@
+/*
+ * The main method for the program.
+ * Asks the user if they want to create and solve a maze.
+ * Then, asks the user what form of generation they want to use for the maze.
+ * Finally, it prints out the solved maze using both solving algorithms and
+ * prints the amount of time it took to solve each one.
+ * This can be repeated as many times as the user requests, until they quit the program.
+ * 
+ */
+
 mod maze;
 use maze::maze_operations;
 use std::io;
@@ -16,6 +26,10 @@ fn main() {
         let x: usize = input.trim().parse().expect("Please input an integer.");
         if x == 1 {
             println!("Give the dimensions for the maze in format: rows cols.");
+
+            //Asks the user for the dimensions of the maze
+            //Both rows and cols must be 3 or greater, or it will
+            //loop around and ask again until 2 good arguments are given.
             loop {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).expect("No line given.");
