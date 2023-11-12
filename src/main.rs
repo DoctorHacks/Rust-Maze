@@ -18,21 +18,24 @@ fn main() {
                 let mut nums = input.trim().split_whitespace();
                 let rows: usize = nums
                     .next()
-                    .expect("No Next")
+                    .expect("No Next.")
                     .parse()
-                    .expect("Not a Valid Integer");
+                    .expect("Not a Valid Integer.");
                 let cols: usize = nums
                     .next()
                     .expect("No Next")
                     .parse()
-                    .expect("Not a Valid Integer");
+                    .expect("Not a Valid Integer.");
 
-                ////////
-                loop {
+                if cols >= 3 && rows >= 3{
+                    break;
+                } else println("Rows and cols must be 3 or greater.");
+            }
+            loop {
                     println!("Type 1 to use prim algorithm.\n Type 2 to use random walk algorithm.\n Type 3 to use recursive division algorithm.");
                     let mut input = String::new();
-                    io::stdin().read_line(&mut input).expect("No line given");
-                    let x: usize = input.trim().parse().expect("Please input an integer");
+                    io::stdin().read_line(&mut input).expect("No line given.");
+                    let x: usize = input.trim().parse().expect("Please input an integer.");
                     match x{
                         1 => {
                             let maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::Prim);
@@ -46,19 +49,17 @@ fn main() {
                             let maze: Maze = Maze::new_from((rows,cols), CreationAlgorithm::RecursiveDivision);
                             break;
                         }
-                        _ => println!("Please input an acceptable integer")
+                        _ => println!("Please input an acceptable integer.")
                     }
                 }
                 ////////
                 println!("{} {}", rows, cols);
-                let maze: Maze = Maze::new_from((rows, cols), CreationAlgorithm::Prim);
                 println!("{}", maze);
-            }
         } else if x == 2 {
             break;
         } else {
             // h
-            println!("Please input an acceptable integer");
+            println!("Please input an acceptable integer.");
         }
     }
 }
