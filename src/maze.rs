@@ -95,10 +95,7 @@ pub mod maze_operations {
          * true--using our default choice of recursive backtracking.
          */
         pub fn solve(&mut self) {
-            if !self.is_solved() {
-                self.unsolve()
-            }
-            self.solve_from_backtracking(self.entrypoint);
+            self.solve_from(SolvingAlgorithm::RecursiveBacktracking);
         }
 
         /*
