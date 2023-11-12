@@ -39,14 +39,23 @@ mod maze_operations {
         DeadEndFilling,
     }
 
-    /*
-     * Creates a new Maze of specified size and with the specified algorithm for doing so.
-     * Expects the dimensions to be at least 3x3, and each should be odd; if an even number is
-     * passed, the dimension will be incremented by 1 (for example, trying to create a 10x10 Maze
-     * will result in an 11x11 Maze).
-     */
     impl Maze {
-        pub fn new(dimensions: (usize, usize), algorithm: CreationAlgorithm) -> Self {
+        /*
+         * Creates a new Maze of specified size. Since the user didn't specify an algorithm, we've
+         * opted to make the default the Prim algolrithm, since it's our only iterative generation
+         * implementation (and we just think it's neat).
+         */
+        pub fn new(dimensions: (usize, usize)) -> Self {
+            Self::new_from(dimensions, CreationAlgorithm::Prim)
+        }
+
+        /*
+         * Creates a new Maze of specified size and with the specified algorithm for doing so.
+         * Expects the dimensions to be at least 3x3, and each should be odd; if an even number is
+         * passed, the dimension will be incremented by 1 (for example, trying to create a 10x10
+         * Maze will result in an 11x11 Maze).
+         */
+        pub fn new_from(dimensions: (usize, usize), algorithm: CreationAlgorithm) -> Self {
             use CreationAlgorithm::*;
             // mazes smaller than 3x3 don't make sense
             if dimensions.0 <= 2 || dimensions.1 <= 2 {
@@ -81,9 +90,18 @@ mod maze_operations {
         }
 
         /*
-         * Solves this Maze--sets the visited bool of each Cell on the way to the goalpoint to true.
+         * Solves this Maze--sets the visited bool of each Cell on the way to the goalpoint to
+         * true--using our default choice of recursive backtracking.
          */
-        pub fn solve(&mut self, algorithm: SolvingAlgorithm) {
+        pub fn solve(&mut self) {
+            self.solve_from_backtracking(self.entrypoint);
+        }
+
+        /*
+         * Solves this Maze--sets the visited bool of each Cell on the way to the goalpoint to
+         * true--using the specified algorithm for doing so.
+         */
+        pub fn solve_from(&mut self, algorithm: SolvingAlgorithm) {
             use SolvingAlgorithm::*;
             match algorithm {
                 RecursiveBacktracking => self.solve_from_backtracking(self.entrypoint),
@@ -559,8 +577,8 @@ mod maze_operations {
 
 use maze_operations::*;
 fn main() {
-    let mut maze: Maze = Maze::new((55, 55), CreationAlgorithm::Prim);
+    let mut maze: Maze = Maze::new_from((55, 55), CreationAlgorithm::Prim);
     println!("{}", maze);
-    maze.solve(SolvingAlgorithm::DeadEndFilling);
+    maze.solve_from(SolvingAlgorithm::DeadEndFilling);
     println!("{}", maze);
 }
