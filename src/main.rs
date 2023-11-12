@@ -1,7 +1,7 @@
 /*
  * A module containing a Maze struct, capable of generating, representing, and solving a
- * two-dimensional labyrinth with exactly one path from the entry point at the top-left to the goal
- * point at the bottom-right.
+ * two-dimensional Maze with exactly one path from the entry point at the top-left to the goal point
+ * at the bottom-right.
  *
  * Authors: Brandon Ikeler, Travis Hahn
  */
@@ -94,6 +94,9 @@ mod maze_operations {
          * true--using our default choice of recursive backtracking.
          */
         pub fn solve(&mut self) {
+            if !self.is_solved() {
+                self.unsolve()
+            }
             self.solve_from_backtracking(self.entrypoint);
         }
 
@@ -102,6 +105,9 @@ mod maze_operations {
          * true--using the specified algorithm for doing so.
          */
         pub fn solve_from(&mut self, algorithm: SolvingAlgorithm) {
+            if !self.is_solved() {
+                self.unsolve()
+            }
             use SolvingAlgorithm::*;
             match algorithm {
                 RecursiveBacktracking => self.solve_from_backtracking(self.entrypoint),
