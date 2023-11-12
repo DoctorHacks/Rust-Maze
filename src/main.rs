@@ -64,10 +64,12 @@ fn main() {
                 }
                 println!("{} {}", rows, cols);
                 println!("{}", maze);
-                println!("Choose which algorithm to use to solve the maze\n
-                        Type 1 to use recursive backtracking algorithm.\n
-                        Type 2 to use dead end filling algorithm.\n");
-                loop{
+                println!("Press enter to show the solved maze using recursive backtracking");
+                let timer = Instant::now();
+                maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
+                println!("It took {} Seconds", time.elapsed());
+                println!("Press enter to show the solved maze using dead end filling");
+               /** loop{
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).expect("No line given.");
                     let x: usize = input.trim().parse().expect("Please input an integer.");
@@ -86,7 +88,7 @@ fn main() {
                         }
                         _ => {println!("Please input an acceptable integer.");}
                     }
-                }
+                }*/
                 println!("{}", maze);
         } else if x == 2 {
             break;
