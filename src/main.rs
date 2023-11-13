@@ -5,91 +5,211 @@ use std::time::Instant;
 
 use crate::maze_operations::*;
 fn main() {
-    let mut rows;
-    let mut cols;
     let mut maze;
-    let mut input = String::new();
-    loop {
-        println!("Type 1 to create and solve a maze.\nType 2 to quit.");
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("No line given.");
-        let x: usize = input.trim().parse().expect("Please input an integer.");
-        if x == 1 {
-            println!("Give the dimensions for the maze in format: rows cols.");
-            loop {
-                let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("No line given.");
-                let mut nums = input.trim().split_whitespace();
-                rows = nums
-                    .next()
-                    .expect("No Next.")
-                    .parse()
-                    .expect("Not a Valid Integer.");
-                cols = nums
-                    .next()
-                    .expect("No Next")
-                    .parse()
-                    .expect("Not a Valid Integer.");
 
-                if cols >= 3 && rows >= 3 {
-                    break;
-                } else {
-                    println!("Rows and cols must be 3 or greater.");
+    // This program runs in a loop. It prompts the user whether they'd like to continue, and if so,
+    // it asks what Maze dimensions they'd like the maze too be and which algorithm should be used
+    // to generate it.
+    loop {
+        let mut input = String::new();
+        let mut continue_choice = 0;
+
+        // Get user's choice--do they want to keep generating mazes, or are they done?
+        while {
+            input.clear();
+            println!("Enter 1 to create and solve a maze.\nEnter 2 to quit.");
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read line");
+
+            // User pressed enter without typing anything
+            input.trim().is_empty() && {
+                println!("No input detected."); // side-effects are allowed in expressions!
+                true
+            } || {
+                match input.trim().parse::<i32>() {
+                    // User correctly input a value of 1 or 2
+                    Ok(parsed) if 1 <= parsed && parsed <= 2 => {
+                        continue_choice = parsed;
+                        false
+                    }
+                    // User input an integer, but not a 1 or a 2
+                    Ok(_) => {
+                        println!("Please enter an acceptable integer.");
+                        true
+                    }
+                    // User didn't input an integer
+                    Err(_) => {
+                        println!("Expected an integer.");
+                        true
+                    }
                 }
             }
-            //Loop for user to input how they want their maze to be generated
-            //1:Prim Algorithm 2:Random Walk Algorithm 3:Recursive Division Algorithm
-            println!(
-                "Choose which algorithm to use to generate maze\n
-                        Type 1 to use prim algorithm.\n
-                        Type 2 to use random walk algorithm.\n
-                        Type 3 to use recursive division algorithm."
-            );
-            loop {
+        } { /* this is technically the loop body */ }
+
+        match continue_choice {
+            // User is done making mazes. :(
+            2 => {
+                break;
+            }
+            // User wants to generate a maze!
+            1 => {
                 let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("No line given.");
-                let x: usize = input.trim().parse().expect("Please input an integer.");
-                match x {
+                let mut rows = 0;
+                let mut cols = 0;
+
+                // What dimensions do they want the maze to be?
+                while {
+                    input.clear();
+                    println!("Enter the dimensions for the maze in format: rows cols.");
+                    io::stdin()
+                        .read_line(&mut input)
+                        .expect("Failed to read line.");
+                    let mut nums = input.trim().split_whitespace();
+                    ({
+                        match nums.next() {
+                            Some(next) => match next.parse::<usize>() {
+                                // User correctly input an integer for rows
+                                Ok(parsed_rows) => {
+                                    rows = parsed_rows;
+                                    false
+                                }
+                                // User input something, but it wasn't an integer
+                                Err(_) => {
+                                    println!("Failed to parse rows.");
+                                    true
+                                }
+                            },
+                            // User didn't input anything for rows
+                            None => {
+                                println!("Failed to read rows.");
+                                true
+                            }
+                        }
+                    }) || ({
+                        match nums.next() {
+                            Some(next) => match next.parse::<usize>() {
+                                // User correctly input an integer for cols
+                                Ok(parsed_cols) => {
+                                    cols = parsed_cols;
+                                    false
+                                }
+                                // User input something, but it wasn't an integer
+                                Err(_) => {
+                                    println!("Failed to parse cols.");
+                                    true
+                                }
+                            },
+                            // User didn't input anything for cols
+                            None => {
+                                println!("Failed to read cols.");
+                                true
+                            }
+                        }
+                    }) || {
+                        // User input values for rows and cols, but at least one of them was less
+                        // than 3--and mazes smaller than 3x3 don't make sense.
+                        cols <= 3
+                            || rows <= 3 && {
+                                println!("Rows and cols must be 3 or greater.");
+                                true
+                            }
+                    }
+                } {}
+
+                let mut input = String::new();
+                let mut algorithm_choice = 0;
+
+                // Which maze generation algorithm would they like to employ?
+                while {
+                    input.clear();
+                    println!(concat!(
+                        "Choose which algorithm to use to generate the maze:\n",
+                        "Enter 1 to use Prim's algorithm.\n",
+                        "Enter 2 to perform a random walk.\n",
+                        "Enter 3 to recursively divide."
+                    ));
+                    io::stdin()
+                        .read_line(&mut input)
+                        .expect("Failed to read line");
+
+                    // User pressed enter without typing anything
+                    input.trim().is_empty() && {
+                        println!("No input detected.");
+                        true
+                    } || {
+                        match input.trim().parse::<i32>() {
+                            // User correctly input a value from 1 to 3
+                            Ok(parsed) if 1 <= parsed && parsed <= 3 => {
+                                algorithm_choice = parsed;
+                                false
+                            }
+                            // User input an integer, but it wasn't from 1 to 3
+                            Ok(_) => {
+                                println!("Please enter an acceptable integer.");
+                                true
+                            }
+                            // User typed something other than an integer
+                            Err(_) => {
+                                println!("Expected an integer.");
+                                true
+                            }
+                        }
+                    }
+                } {}
+
+                match algorithm_choice {
                     1 => {
                         maze = Maze::new_from((rows, cols), CreationAlgorithm::Prim);
-                        break;
                     }
                     2 => {
                         maze = Maze::new_from((rows, cols), CreationAlgorithm::RandomWalk);
-                        break;
                     }
                     3 => {
                         maze = Maze::new_from((rows, cols), CreationAlgorithm::RecursiveDivision);
-                        break;
                     }
-                    _ => println!("Please input an acceptable integer."),
+                    _ => {
+                        maze = Maze::new((rows, cols)); // unreachable
+                    }
                 }
+                println!("{}", maze);
+
+                //Recursive Backtracking Solver
+                println!("Solving via recursive backtracking (press enter to continue).");
+                let mut input = String::new();
+                let _ = io::stdin().read_line(&mut input);
+                let timer = Instant::now();
+                maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
+                let duration = timer.elapsed().as_micros();
+                println!("{}", maze);
+                println!(
+                    "It took {:?} microseconds to solve via recursive backtracking.",
+                    duration
+                );
+
+                maze.unsolve();
+
+                //Dead End Filling Solver
+                println!("Solving via dead-end filling (press enter to continue).");
+                let mut input = String::new();
+                let _ = io::stdin().read_line(&mut input);
+                let timer = Instant::now();
+                maze.solve_from(SolvingAlgorithm::DeadEndFilling);
+                let duration = timer.elapsed().as_micros();
+                println!("{}", maze);
+                println!(
+                    "It took {:?} microseconds to solve via dead-end filling.",
+                    duration
+                );
+                let mut input = String::new();
+                println!("Press enter to continue.");
+                let _ = io::stdin().read_line(&mut input);
             }
-            println!("{} {}", rows, cols);
-            println!("{}", maze);
-
-            //Recursive Backtracking Solver
-            println!("Press enter to show the solved maze using recursive backtracking");
-            let mut input = String::new();
-            io::stdin().read_line(&mut input);
-            let timer = Instant::now();
-            maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-            println!("It took {:?} Seconds", timer.elapsed());
-            println!("{}", maze);
-
-            //Dead End Filling Solver
-            println!("Press enter to show the solved maze using dead end filling");
-            let mut input = String::new();
-            io::stdin().read_line(&mut input);
-            let timer = Instant::now();
-            maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
-            println!("It took {:?} Seconds", timer.elapsed());
-            println!("{}", maze);
-            
-        } else if x == 2 {
-            break;
-        } else {
-            println!("Please input an acceptable integer.");
+            // the only possible values of continue_choice by the point the match statement is
+            // reached are 1 and 2, so this can't ever execute.
+            _ => {
+                panic!("Unexpected error while processing decision to continue");
+            }
         }
     }
 }

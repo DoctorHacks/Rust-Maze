@@ -94,6 +94,7 @@ pub mod maze_operations {
          * Solves this Maze--sets the visited bool of each Cell on the way to the goalpoint to
          * true--using our default choice of recursive backtracking.
          */
+        #[allow(dead_code)]
         pub fn solve(&mut self) {
             self.solve_from(SolvingAlgorithm::RecursiveBacktracking);
         }
@@ -570,7 +571,10 @@ pub mod maze_operations {
                         }
                     })?;
                 }
-                write!(f, "{}", "\u{00a0}\n".clear())?;
+                write!(f, "{}", "\u{00a0}".clear())?;
+                if y != self.dimensions.0 - 1 {
+                    write!(f, "\n")?;
+                }
             }
             Ok(())
         }
