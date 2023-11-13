@@ -1,11 +1,11 @@
 /*
- * The main method for the program.
- * Asks the user if they want to create and solve a maze.
- * Then, asks the user what form of generation they want to use for the maze.
- * Finally, it prints out the solved maze using both solving algorithms and
- * prints the amount of time it took to solve each one.
+ * Asks the user if they'd like to create and solve a maze. If they do, they're prompted for the
+ * dimensions of their maze, and which maze generation algorithm they'd like to employ. Then, their
+ * maze is printed with the solution computed via recursive backtracking and dead-end filling, along
+ * with the amount of time it took to compute each solution.
  * This can be repeated as many times as the user requests, until they quit the program.
  *
+ * Author: Brandon Ikeler, Travis Hahn
  */
 
 mod maze;
@@ -17,9 +17,8 @@ use crate::maze_operations::*;
 fn main() {
     let mut maze;
 
-    // This program runs in a loop. It prompts the user whether they'd like to continue, and if so,
-    // it asks what Maze dimensions they'd like the maze too be and which algorithm should be used
-    // to generate it.
+    // Prompt the user whether they'd like to continue. If so, ask what dimensions they'd like it to
+    // be and which algorithm should be used to generate it.
     loop {
         let mut input = String::new();
         let mut continue_choice = 0;
