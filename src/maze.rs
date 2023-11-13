@@ -167,7 +167,7 @@ pub mod maze_operations {
                 current.visited = true;
 
                 let get_two_offset_shuffle = || -> [(isize, isize); 4] {
-                    let mut two_offsets = [(-2, 0), (2, 0), (0, -2), (0, 2)];
+                    let mut two_offsets: [(isize, isize); 4] = [(-2, 0), (2, 0), (0, -2), (0, 2)];
                     let mut rng = thread_rng();
                     two_offsets.shuffle(&mut rng);
                     two_offsets
