@@ -206,7 +206,7 @@ pub mod maze_operations {
                 }
             }
 
-            walk(&mut cells, starter, (dimensions.0, dimensions.1));
+            walk(&mut cells, starter, dimensions);
 
             // set each cell back to unvisited, so the Maze will print properly
             for row in &mut cells {
