@@ -21,7 +21,7 @@ pub mod maze_operations {
         cells: Vec<Vec<Cell>>,
     }
 
-    #[derive(Clone)] // required because vec![] uses .clone() on cell structs
+    #[derive(Clone)]
     struct Cell {
         wall: bool,
         visited: bool,
