@@ -184,13 +184,15 @@ fn main() {
                 }
                 println!("{}", maze);
 
-                //Recursive Backtracking Solver
+                // Time solving via recursive backtracking
                 println!("Solving via recursive backtracking (press enter to continue).");
                 let mut input = String::new();
                 let _ = io::stdin().read_line(&mut input);
+
                 let timer = Instant::now();
                 maze.solve_from(SolvingAlgorithm::RecursiveBacktracking);
                 let duration = timer.elapsed().as_micros();
+
                 println!("{}", maze);
                 println!(
                     "It took {:?} microseconds to solve via recursive backtracking.",
@@ -199,18 +201,21 @@ fn main() {
 
                 maze.unsolve();
 
-                //Dead End Filling Solver
+                // Time solving via dead-end filling
                 println!("Solving via dead-end filling (press enter to continue).");
                 let mut input = String::new();
                 let _ = io::stdin().read_line(&mut input);
+
                 let timer = Instant::now();
                 maze.solve_from(SolvingAlgorithm::DeadEndFilling);
                 let duration = timer.elapsed().as_micros();
+
                 println!("{}", maze);
                 println!(
                     "It took {:?} microseconds to solve via dead-end filling.",
                     duration
                 );
+
                 let mut input = String::new();
                 println!("Press enter to continue.");
                 let _ = io::stdin().read_line(&mut input);
