@@ -118,11 +118,11 @@ fn main() {
                     }) || {
                         // User input values for rows and cols, but at least one of them was less
                         // than 3--and mazes smaller than 3x3 don't make sense.
-                        cols <= 3
-                            || rows <= 3 && {
-                                println!("Rows and cols must be 3 or greater.");
-                                true
-                            }
+                        let unacceptable_size = cols < 3 || rows < 3;
+                        unacceptable_size && {
+                            println!("Rows and cols must be 3 or greater.");
+                            true
+                        }
                     }
                 } {}
 
